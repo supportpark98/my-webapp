@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Drive API Quickstart</title>
+  <title>Thumbnail Maker for KERA</title>
   <style>
     #canvas {
       border: 1px solid black;
@@ -15,31 +15,53 @@
       -webkit-appearance: none;
       margin: 0;
     }
+    .search-box {
+      width: 200px;
+      padding: 5px;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .dropdown-content div {
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+    .dropdown-content div:hover {
+      background-color: #f1f1f1;
+    }
   </style>
 </head>
 <body>
-  <p>Drive API Quickstart</p>
+  <p>Thumbnail Maker for KERA</p>
 
   <button id="authorize_button" onclick="handleAuthClick()" aria-label="Authorize">Authorize</button>
   <button id="signout_button" onclick="handleSignoutClick()" aria-label="Sign Out">Sign Out</button>
 
   <div id="main_product">
     <h3>본품 1을 골라주세요</h3>
-    <select id="main_product_selector1"></select>
+    <input type="text" id="main_product_search1" class="search-box" placeholder="Search...">
+    <div id="main_product_dropdown1" class="dropdown-content"></div>
     <select id="main_product_ratio1"></select>
-    <button onclick="displayProduct(1, 'main')" aria-label="본품 1 확인">확인</button>
+    <button onclick="displayProduct(1, 'main')" aria-label="본품 1 적용">적용</button>
     <button onclick="selectProduct(1, 'main')" aria-label="본품 1 위치 수정">위치 수정</button>
 
     <h3>본품 2을 골라주세요</h3>
-    <select id="main_product_selector2"></select>
+    <input type="text" id="main_product_search2" class="search-box" placeholder="Search...">
+    <div id="main_product_dropdown2" class="dropdown-content"></div>
     <select id="main_product_ratio2"></select>
-    <button onclick="displayProduct(2, 'main')" aria-label="본품 2 확인">확인</button>
+    <button onclick="displayProduct(2, 'main')" aria-label="본품 2 적용">적용</button>
     <button onclick="selectProduct(2, 'main')" aria-label="본품 2 위치 수정">위치 수정</button>
 
     <h3>본품 3을 골라주세요</h3>
-    <select id="main_product_selector3"></select>
+    <input type="text" id="main_product_search3" class="search-box" placeholder="Search...">
+    <div id="main_product_dropdown3" class="dropdown-content"></div>
     <select id="main_product_ratio3"></select>
-    <button onclick="displayProduct(3, 'main')" aria-label="본품 3 확인">확인</button>
+    <button onclick="displayProduct(3, 'main')" aria-label="본품 3 적용">적용</button>
     <button onclick="selectProduct(3, 'main')" aria-label="본품 3 위치 수정">위치 수정</button>
   </div>
 
@@ -51,10 +73,11 @@
       <option value="2">2. DLX</option>
       <option value="3">3. SC</option>
     </select>
-    <select id="gift_product_selector1"></select>
+    <input type="text" id="gift_product_search1" class="search-box" placeholder="Search...">
+    <div id="gift_product_dropdown1" class="dropdown-content"></div>
     <select id="gift_product_ratio1"></select>
     <input type="number" id="gift_quantity1" min="1" placeholder="수량" class="quantity-input">
-    <button onclick="displayProduct(1, 'gift')" aria-label="증정품 1 확인">확인</button>
+    <button onclick="displayProduct(1, 'gift')" aria-label="증정품 1 적용">적용</button>
     <button onclick="selectProduct(1, 'gift')" aria-label="증정품 1 위치 수정">위치 수정</button>
 
     <h3>증정품 2을 골라주세요</h3>
@@ -64,10 +87,11 @@
       <option value="2">2. DLX</option>
       <option value="3">3. SC</option>
     </select>
-    <select id="gift_product_selector2"></select>
+    <input type="text" id="gift_product_search2" class="search-box" placeholder="Search...">
+    <div id="gift_product_dropdown2" class="dropdown-content"></div>
     <select id="gift_product_ratio2"></select>
     <input type="number" id="gift_quantity2" min="1" placeholder="수량" class="quantity-input">
-    <button onclick="displayProduct(2, 'gift')" aria-label="증정품 2 확인">확인</button>
+    <button onclick="displayProduct(2, 'gift')" aria-label="증정품 2 적용">적용</button>
     <button onclick="selectProduct(2, 'gift')" aria-label="증정품 2 위치 수정">위치 수정</button>
 
     <h3>증정품 3을 골라주세요</h3>
@@ -77,10 +101,11 @@
       <option value="2">2. DLX</option>
       <option value="3">3. SC</option>
     </select>
-    <select id="gift_product_selector3"></select>
+    <input type="text" id="gift_product_search3" class="search-box" placeholder="Search...">
+    <div id="gift_product_dropdown3" class="dropdown-content"></div>
     <select id="gift_product_ratio3"></select>
     <input type="number" id="gift_quantity3" min="1" placeholder="수량" class="quantity-input">
-    <button onclick="displayProduct(3, 'gift')" aria-label="증정품 3 확인">확인</button>
+    <button onclick="displayProduct(3, 'gift')" aria-label="증정품 3 적용">적용</button>
     <button onclick="selectProduct(3, 'gift')" aria-label="증정품 3 위치 수정">위치 수정</button>
   </div>
 
@@ -96,42 +121,42 @@
     const API_KEY = 'AIzaSyBFObap5GFgCLBpsQTFFuLx8qMyTWiZ6YM';
     const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
     const SCOPES = 'https://www.googleapis.com/auth/drive';
-
+  
     let tokenClient;
     let gapiInited = false;
     let gisInited = false;
-
+  
     document.getElementById('authorize_button').style.visibility = 'hidden';
     document.getElementById('signout_button').style.visibility = 'hidden';
-
+  
     const giftTypeToFolderId = {
       '1': '173TTRzelK-SXZaBXzrJOC31f9izyUyxo',
       '2': '1aiwrAEySie43JHGsaZUOeEv3cK9IQuFu',
       '3': '1Tin54hFiR88BiJS2VCwFyPeOCnqN2jiO'
     };
-
+  
     let mainProductImages = [null, null, null];
     let giftProductImages = [null, null, null];
     let giftQuantities = [0, 0, 0];
     let selectedImageIndex = null; 
     let isEditing = false; 
-
+  
     const mainProductPositions = [
       { x: 37, y: 190 },
       { x: 75, y: 190 },
       { x: 112, y: 190 }
     ];
-
+  
     const giftProductPositions = [
       { x: 175, y: 200 },
       { x: 212, y: 200 },
       { x: 249, y: 200 }
     ];
-
+  
     function gapiLoaded() {
       gapi.load('client', initializeGapiClient);
     }
-
+  
     async function initializeGapiClient() {
       await gapi.client.init({
         apiKey: API_KEY,
@@ -140,7 +165,7 @@
       gapiInited = true;
       maybeEnableButtons();
     }
-
+  
     function gisLoaded() {
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
@@ -150,13 +175,13 @@
       gisInited = true;
       maybeEnableButtons();
     }
-
+  
     function maybeEnableButtons() {
       if (gapiInited && gisInited) {
         document.getElementById('authorize_button').style.visibility = 'visible';
       }
     }
-
+  
     function handleAuthClick() {
       tokenClient.callback = async (resp) => {
         if (resp.error !== undefined) {
@@ -164,18 +189,18 @@
         }
         document.getElementById('signout_button').style.visibility = 'visible';
         document.getElementById('authorize_button').innerText = 'Refresh';
-        await listFilesInFolder('1m3dw2iTMJy2sn5hiAgIbvmNlNcJm02yV', 'main_product_selector1');
-        await listFilesInFolder('1m3dw2iTMJy2sn5hiAgIbvmNlNcJm02yV', 'main_product_selector2');
-        await listFilesInFolder('1m3dw2iTMJy2sn5hiAgIbvmNlNcJm02yV', 'main_product_selector3');
+        await listFilesInFolder('1m3dw2iTMJy2sn5hiAgIbvmNlNcJm02yV', 'main_product_search1', 'main_product_dropdown1');
+        await listFilesInFolder('1m3dw2iTMJy2sn5hiAgIbvmNlNcJm02yV', 'main_product_search2', 'main_product_dropdown2');
+        await listFilesInFolder('1m3dw2iTMJy2sn5hiAgIbvmNlNcJm02yV', 'main_product_search3', 'main_product_dropdown3');
       };
-
+  
       if (gapi.client.getToken() === null) {
         tokenClient.requestAccessToken({prompt: 'consent'});
       } else {
         tokenClient.requestAccessToken({prompt: ''});
       }
     }
-
+  
     function handleSignoutClick() {
       const token = gapi.client.getToken();
       if (token !== null) {
@@ -186,13 +211,14 @@
         document.getElementById('signout_button').style.visibility = 'hidden';
       }
     }
-
-    async function listFilesInFolder(folderId, selectorId) {
+  
+    async function listFilesInFolder(folderId, searchBoxId, dropdownId) {
       let response;
       try {
         response = await gapi.client.drive.files.list({
           'q': `'${folderId}' in parents and mimeType contains 'image/'`,
           'fields': 'files(id, name, mimeType, thumbnailLink)',
+          'orderBy': 'name' // 파일 이름을 기준으로 오름차순 정렬
         });
         console.log(response);
       } catch (err) {
@@ -200,36 +226,67 @@
         console.error(err);
         return;
       }
-      const items = response.result.files;
-      const selector = document.getElementById(selectorId);
-      selector.innerHTML = '';
-      const defaultOption = document.createElement('option');
-      defaultOption.text = '없음';
-      defaultOption.value = '';
-      selector.appendChild(defaultOption);
-
+  
+      const items = response.result.files.sort((a, b) => a.name.localeCompare(b.name));
+      const searchBox = document.getElementById(searchBoxId);
+      const dropdown = document.getElementById(dropdownId);
+      dropdown.innerHTML = '';
+  
+      const noneOption = document.createElement('div');
+      noneOption.textContent = '없음';
+      noneOption.onclick = () => {
+        searchBox.value = '없음';
+        searchBox.dataset.thumbnailLink = '';
+        dropdown.style.display = 'none';
+      };
+      dropdown.appendChild(noneOption);
+  
       items.forEach((item) => {
-        const option = document.createElement('option');
-        option.text = item.name;
-        option.value = item.thumbnailLink;
-        selector.appendChild(option);
+        const div = document.createElement('div');
+        div.textContent = item.name;
+        div.dataset.thumbnailLink = item.thumbnailLink;
+        div.onclick = () => {
+          searchBox.value = item.name;
+          searchBox.dataset.thumbnailLink = item.thumbnailLink;
+          dropdown.style.display = 'none';
+        };
+        dropdown.appendChild(div);
       });
+  
+      searchBox.oninput = () => filterFiles(searchBoxId, dropdownId);
+      searchBox.onclick = () => dropdown.style.display = 'block';
     }
-
+  
+    function filterFiles(searchBoxId, dropdownId) {
+      const searchBox = document.getElementById(searchBoxId);
+      const dropdown = document.getElementById(dropdownId);
+      const filter = searchBox.value.toLowerCase().replace(/\s+/g, '');
+      const divs = dropdown.getElementsByTagName('div');
+  
+      for (let i = 0; i < divs.length; i++) {
+        const txtValue = divs[i].textContent || divs[i].innerText;
+        if (txtValue.toLowerCase().replace(/\s+/g, '').indexOf(filter) > -1) {
+          divs[i].style.display = '';
+        } else {
+          divs[i].style.display = 'none';
+        }
+      }
+    }
+  
     function handleGiftTypeChange(index) {
       const giftType = document.getElementById(`gift_type_selector${index}`).value;
       if (giftType) {
         const folderId = giftTypeToFolderId[giftType];
-        listFilesInFolder(folderId, `gift_product_selector${index}`);
+        listFilesInFolder(folderId, `gift_product_search${index}`, `gift_product_dropdown${index}`);
       } else {
-        document.getElementById(`gift_product_selector${index}`).innerHTML = '';
+        document.getElementById(`gift_product_dropdown${index}`).innerHTML = '';
       }
     }
-
+  
     function displayProduct(index, type) {
-      const selector = document.getElementById(`${type}_product_selector${index}`);
+      const searchBox = document.getElementById(`${type}_product_search${index}`);
       const ratioSelector = document.getElementById(`${type}_product_ratio${index}`);
-      const thumbnailLink = selector.value;
+      const thumbnailLink = searchBox.dataset.thumbnailLink;
       const ratio = parseInt(ratioSelector.value, 10) / 100;
       const imageArray = type === 'main' ? mainProductImages : giftProductImages;
       if (thumbnailLink) {
@@ -246,18 +303,17 @@
         giftQuantities[index - 1] = quantityInput.value || 0;
       }
     }
-
+  
     function selectProduct(index, type) {
       const button = event.target;
-
-      // 모든 버튼을 초기 상태로 되돌리기
+  
       document.querySelectorAll('#main_product button, #gift_product button').forEach(btn => {
         if (btn.innerText === '위치 변경중') {
           btn.innerText = '위치 수정';
           btn.style.backgroundColor = '';
         }
       });
-
+  
       if (isEditing && selectedImageIndex === index - 1 + (type === 'main' ? 0 : 3)) {
         isEditing = false;
         selectedImageIndex = null;
@@ -269,20 +325,18 @@
         selectedImageIndex = index - 1 + (type === 'main' ? 0 : 3);
         const productType = type === 'main' ? '본품' : '증정품';
         document.getElementById('selection_message').innerText = `${productType} 이미지 ${index}이 선택되었습니다!`;
-
-        // 선택된 버튼만 변경
+  
         button.innerText = '위치 변경중';
         button.style.backgroundColor = 'lightblue';
       }
       drawCanvas();
     }
-
-
+  
     function drawCanvas() {
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+  
       mainProductImages.forEach((image, index) => {
         if (image) {
           const pos = mainProductPositions[index];
@@ -291,15 +345,15 @@
           const x = pos.x - scaledWidth / 2;
           const y = pos.y - scaledHeight / 2;
           ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
-
+  
           if (selectedImageIndex === index) {
             ctx.strokeStyle = 'red';
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 1;
             ctx.strokeRect(x, y, scaledWidth, scaledHeight);
           }
         }
       });
-
+  
       giftProductImages.forEach((image, index) => {
         if (image) {
           const pos = giftProductPositions[index];
@@ -308,28 +362,27 @@
           const x = pos.x - scaledWidth / 2;
           const y = pos.y - scaledHeight / 2;
           ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
-
+  
           if (selectedImageIndex === index + 3) {
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 5;
             ctx.strokeRect(x, y, scaledWidth, scaledHeight);
           }
-
+  
           const quantity = giftQuantities[index];
           if (quantity > 0) {
             const text = `X ${quantity}`;
             ctx.fillStyle = '#000';
             ctx.font = '16px Arial';
             const textWidth = ctx.measureText(text).width;
-            const textX = pos.x - textWidth / 2; // 텍스트의 중앙을 이미지의 중앙에 맞춤
+            const textX = pos.x - textWidth / 2;
             const textY = pos.y - scaledHeight / 2 - 10;
             ctx.fillText(text, textX, textY);
           }
         }
       });
     }
-
-
+  
     function resetAll() {
       mainProductImages = [null, null, null];
       giftProductImages = [null, null, null];
@@ -338,6 +391,8 @@
       isEditing = false;
       document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
       document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+      document.querySelectorAll('.search-box').forEach(input => input.value = '');
+      document.querySelectorAll('.dropdown-content').forEach(dropdown => dropdown.innerHTML = '');
       const mainProductRatios = [document.getElementById('main_product_ratio1'), document.getElementById('main_product_ratio2'), document.getElementById('main_product_ratio3')];
       const giftProductRatios = [document.getElementById('gift_product_ratio1'), document.getElementById('gift_product_ratio2'), document.getElementById('gift_product_ratio3')];
       mainProductRatios.forEach((select) => {
@@ -347,28 +402,26 @@
         select.innerHTML = generateRatioOptions(70);
       });
       document.getElementById('selection_message').innerText = '';
-
-        // 본품 & 증정품 영역의 버튼만 선택
+  
       const mainProductButtons = document.querySelectorAll('#main_product button');
       const giftProductButtons = document.querySelectorAll('#gift_product button');
-
-      // 각 버튼 텍스트를 '위치 수정'으로 초기화
+  
       mainProductButtons.forEach(btn => { 
-        if (btn.innerText !== '확인'){ 
+        if (btn.innerText !== '적용'){ 
           btn.innerText = '위치 수정';
           btn.style.backgroundColor = ''; 
         }
       });
       giftProductButtons.forEach(btn => { 
-        if (btn.innerText !== '확인'){ 
+        if (btn.innerText !== '적용'){ 
           btn.innerText = '위치 수정';
           btn.style.backgroundColor = ''; 
         }
       });
-
+  
       drawCanvas();
     }
-
+  
     function generateRatioOptions(defaultValue) {
       let options = '';
       for (let i = 10; i <= 200; i += 10) {
@@ -376,13 +429,12 @@
       }
       return options;
     }
-
+  
     function handleKeyDown(event) {
-      // Prevent page scrolling only for arrow keys and Enter key
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) {
         event.preventDefault();
       }
-
+  
       if (isEditing && selectedImageIndex !== null) {
         const imageArray = selectedImageIndex < 3 ? mainProductImages : giftProductImages;
         const index = selectedImageIndex < 3 ? selectedImageIndex : selectedImageIndex - 3;
@@ -405,8 +457,7 @@
             isEditing = false;
             selectedImageIndex = null;
             document.getElementById('selection_message').innerText = '';
-
-            // 모든 "위치 수정중" 버튼을 "위치 수정" 버튼으로 변경
+  
             document.querySelectorAll('#main_product button, #gift_product button').forEach(btn => {
               if (btn.innerText === '위치 변경중') {
                 btn.innerText = '위치 수정';
@@ -418,19 +469,28 @@
         drawCanvas();
       }
     }
-
+  
     document.addEventListener('keydown', handleKeyDown);
-
+  
     document.addEventListener('DOMContentLoaded', () => {
       const mainProductRatios = [document.getElementById('main_product_ratio1'), document.getElementById('main_product_ratio2'), document.getElementById('main_product_ratio3')];
       const giftProductRatios = [document.getElementById('gift_product_ratio1'), document.getElementById('gift_product_ratio2'), document.getElementById('gift_product_ratio3')];
-
+  
       mainProductRatios.forEach((select, index) => {
         select.innerHTML = generateRatioOptions(100);
       });
-
+  
       giftProductRatios.forEach((select, index) => {
         select.innerHTML = generateRatioOptions(70);
+      });
+    });
+  
+    document.addEventListener('click', (event) => {
+      const dropdowns = document.querySelectorAll('.dropdown-content');
+      dropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target) && !dropdown.previousElementSibling.contains(event.target)) {
+          dropdown.style.display = 'none';
+        }
       });
     });
   </script>
