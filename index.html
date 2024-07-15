@@ -4,6 +4,13 @@
   <meta charset="utf-8" />
   <title>Thumbnail Maker for KERA</title>
   <style>
+    body {
+      transform: scale(0.8); /* 80% 크기로 설정 */
+      transform-origin: top left;
+      width: 125%; /* 80%로 축소된 것을 보정하기 위해 100/80 * 100% */
+      height: 125%; /* 80%로 축소된 것을 보정하기 위해 100/80 * 100% */
+      overflow: hidden; /* 스크롤바가 생기지 않도록 숨김 */
+    }
     #canvas {
       border: 1px solid black;
     }
@@ -22,10 +29,12 @@
     .dropdown-content {
       display: none;
       position: absolute;
-      background-color: #f9f9f9;
+      background-color: white; /* 배경색을 흰색으로 변경 */
       min-width: 200px;
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
+      z-index: 10;
+      height: 500px; /* 높이를 고정하고 스크롤 추가 */
+      overflow-y: auto; /* 스크롤바 추가 */
     }
     .dropdown-content div {
       padding: 12px 16px;
@@ -34,89 +43,123 @@
     .dropdown-content div:hover {
       background-color: #f1f1f1;
     }
+    .container {
+      display: flex;
+      flex-wrap: wrap; /* 요소들이 겹치지 않도록 줄 바꿈 */
+    }
+    .settings {
+      flex: 1 1 300px; /* 최소 너비를 설정하여 줄 바꿈을 유도 */
+      padding: 20px;
+      transform: scale(1.2); /* 120% 확대 */
+      transform-origin: top left;
+    }
+    .canvas-container {
+      flex: 1 1 700px; /* 최소 너비를 설정하여 줄 바꿈을 유도 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .reset-button {
+      font-size: 1.2em; /* 크기 증가 */
+      margin-top: 20px; /* 이격 */
+      background-color: #f0f0f0; /* 구별되게 */
+      padding: 10px 20px;
+    }
+    .asset-button {
+      font-size: 1.2em; /* 크기 증가 */
+      margin-top: 10px; /* 초기화 버튼 아래에 추가 */
+      background-color: #f0f0f0; /* 동일한 디자인 */
+      padding: 10px 20px;
+    }
   </style>
+</head>
+<body>
+  <div class="container">
+    <div class="settings">
+      <p>Thumbnail Maker for KERA</p>
 
-  <p>Thumbnail Maker for KERA</p>
+      <button id="authorize_button" onclick="handleAuthClick()" aria-label="Authorize">Authorize</button>
+      <button id="signout_button" onclick="handleSignoutClick()" aria-label="Sign Out">Sign Out</button>
 
-  <button id="authorize_button" onclick="handleAuthClick()" aria-label="Authorize">Authorize</button>
-  <button id="signout_button" onclick="handleSignoutClick()" aria-label="Sign Out">Sign Out</button>
+      <div id="main_product">
+        <h3>본품 1을 골라주세요</h3>
+        <input type="text" id="main_product_search1" class="search-box" placeholder="Search...">
+        <div id="main_product_dropdown1" class="dropdown-content"></div>
+        <select id="main_product_ratio1"></select>
+        <button onclick="displayProduct(1, 'main')" aria-label="본품 1 적용">적용</button>
+        <button onclick="selectProduct(1, 'main')" aria-label="본품 1 위치 수정">위치 수정</button>
 
-  <div id="main_product">
-    <h3>본품 1을 골라주세요</h3>
-    <input type="text" id="main_product_search1" class="search-box" placeholder="Search...">
-    <div id="main_product_dropdown1" class="dropdown-content"></div>
-    <select id="main_product_ratio1"></select>
-    <button onclick="displayProduct(1, 'main')" aria-label="본품 1 적용">적용</button>
-    <button onclick="selectProduct(1, 'main')" aria-label="본품 1 위치 수정">위치 수정</button>
+        <h3>본품 2을 골라주세요</h3>
+        <input type="text" id="main_product_search2" class="search-box" placeholder="Search...">
+        <div id="main_product_dropdown2" class="dropdown-content"></div>
+        <select id="main_product_ratio2"></select>
+        <button onclick="displayProduct(2, 'main')" aria-label="본품 2 적용">적용</button>
+        <button onclick="selectProduct(2, 'main')" aria-label="본품 2 위치 수정">위치 수정</button>
 
-    <h3>본품 2을 골라주세요</h3>
-    <input type="text" id="main_product_search2" class="search-box" placeholder="Search...">
-    <div id="main_product_dropdown2" class="dropdown-content"></div>
-    <select id="main_product_ratio2"></select>
-    <button onclick="displayProduct(2, 'main')" aria-label="본품 2 적용">적용</button>
-    <button onclick="selectProduct(2, 'main')" aria-label="본품 2 위치 수정">위치 수정</button>
+        <h3>본품 3을 골라주세요</h3>
+        <input type="text" id="main_product_search3" class="search-box" placeholder="Search...">
+        <div id="main_product_dropdown3" class="dropdown-content"></div>
+        <select id="main_product_ratio3"></select>
+        <button onclick="displayProduct(3, 'main')" aria-label="본품 3 적용">적용</button>
+        <button onclick="selectProduct(3, 'main')" aria-label="본품 3 위치 수정">위치 수정</button>
+      </div>
 
-    <h3>본품 3을 골라주세요</h3>
-    <input type="text" id="main_product_search3" class="search-box" placeholder="Search...">
-    <div id="main_product_dropdown3" class="dropdown-content"></div>
-    <select id="main_product_ratio3"></select>
-    <button onclick="displayProduct(3, 'main')" aria-label="본품 3 적용">적용</button>
-    <button onclick="selectProduct(3, 'main')" aria-label="본품 3 위치 수정">위치 수정</button>
+      <div id="gift_product">
+        <h3>증정품 1을 골라주세요</h3>
+        <select id="gift_type_selector1" onchange="handleGiftTypeChange(1)">
+          <option value="">없음</option>
+          <option value="1">1. TS</option>
+          <option value="2">2. DLX</option>
+          <option value="3">3. SC</option>
+        </select>
+        <input type="text" id="gift_product_search1" class="search-box" placeholder="Search...">
+        <div id="gift_product_dropdown1" class="dropdown-content"></div>
+        <select id="gift_product_ratio1"></select>
+        <input type="number" id="gift_quantity1" min="1" placeholder="수량" class="quantity-input">
+        <button onclick="displayProduct(1, 'gift')" aria-label="증정품 1 적용">적용</button>
+        <button onclick="selectProduct(1, 'gift')" aria-label="증정품 1 위치 수정">위치 수정</button>
+
+        <h3>증정품 2을 골라주세요</h3>
+        <select id="gift_type_selector2" onchange="handleGiftTypeChange(2)">
+          <option value="">없음</option>
+          <option value="1">1. TS</option>
+          <option value="2">2. DLX</option>
+          <option value="3">3. SC</option>
+        </select>
+        <input type="text" id="gift_product_search2" class="search-box" placeholder="Search...">
+        <div id="gift_product_dropdown2" class="dropdown-content"></div>
+        <select id="gift_product_ratio2"></select>
+        <input type="number" id="gift_quantity2" min="1" placeholder="수량" class="quantity-input">
+        <button onclick="displayProduct(2, 'gift')" aria-label="증정품 2 적용">적용</button>
+        <button onclick="selectProduct(2, 'gift')" aria-label="증정품 2 위치 수정">위치 수정</button>
+
+        <h3>증정품 3을 골라주세요</h3>
+        <select id="gift_type_selector3" onchange="handleGiftTypeChange(3)">
+          <option value="">없음</option>
+          <option value="1">1. TS</option>
+          <option value="2">2. DLX</option>
+          <option value="3">3. SC</option>
+        </select>
+        <input type="text" id="gift_product_search3" class="search-box" placeholder="Search...">
+        <div id="gift_product_dropdown3" class="dropdown-content"></div>
+        <select id="gift_product_ratio3"></select>
+        <input type="number" id="gift_quantity3" min="1" placeholder="수량" class="quantity-input">
+        <button onclick="displayProduct(3, 'gift')" aria-label="증정품 3 적용">적용</button>
+        <button onclick="selectProduct(3, 'gift')" aria-label="증정품 3 위치 수정">위치 수정</button>
+      </div>
+
+      <button class="reset-button" onclick="resetAll()" aria-label="초기화">초기화</button>
+      <button class="asset-button" onclick="window.open('https://drive.google.com/drive/u/0/folders/1k2jYRKuTFITlcFl_AyFatK49LFwMPmPO')" aria-label="이미지 에셋 추가/제거 바로가기">이미지 에셋 추가/제거 바로가기</button>
+    </div>
+
+    <div class="canvas-container">
+      <canvas id="canvas" width="1000" height="1000"></canvas>
+    </div>
   </div>
-
-  <div id="gift_product">
-    <h3>증정품 1을 골라주세요</h3>
-    <select id="gift_type_selector1" onchange="handleGiftTypeChange(1)">
-      <option value="">없음</option>
-      <option value="1">1. TS</option>
-      <option value="2">2. DLX</option>
-      <option value="3">3. SC</option>
-    </select>
-    <input type="text" id="gift_product_search1" class="search-box" placeholder="Search...">
-    <div id="gift_product_dropdown1" class="dropdown-content"></div>
-    <select id="gift_product_ratio1"></select>
-    <input type="number" id="gift_quantity1" min="1" placeholder="수량" class="quantity-input">
-    <button onclick="displayProduct(1, 'gift')" aria-label="증정품 1 적용">적용</button>
-    <button onclick="selectProduct(1, 'gift')" aria-label="증정품 1 위치 수정">위치 수정</button>
-
-    <h3>증정품 2을 골라주세요</h3>
-    <select id="gift_type_selector2" onchange="handleGiftTypeChange(2)">
-      <option value="">없음</option>
-      <option value="1">1. TS</option>
-      <option value="2">2. DLX</option>
-      <option value="3">3. SC</option>
-    </select>
-    <input type="text" id="gift_product_search2" class="search-box" placeholder="Search...">
-    <div id="gift_product_dropdown2" class="dropdown-content"></div>
-    <select id="gift_product_ratio2"></select>
-    <input type="number" id="gift_quantity2" min="1" placeholder="수량" class="quantity-input">
-    <button onclick="displayProduct(2, 'gift')" aria-label="증정품 2 적용">적용</button>
-    <button onclick="selectProduct(2, 'gift')" aria-label="증정품 2 위치 수정">위치 수정</button>
-
-    <h3>증정품 3을 골라주세요</h3>
-    <select id="gift_type_selector3" onchange="handleGiftTypeChange(3)">
-      <option value="">없음</option>
-      <option value="1">1. TS</option>
-      <option value="2">2. DLX</option>
-      <option value="3">3. SC</option>
-    </select>
-    <input type="text" id="gift_product_search3" class="search-box" placeholder="Search...">
-    <div id="gift_product_dropdown3" class="dropdown-content"></div>
-    <select id="gift_product_ratio3"></select>
-    <input type="number" id="gift_quantity3" min="1" placeholder="수량" class="quantity-input">
-    <button onclick="displayProduct(3, 'gift')" aria-label="증정품 3 적용">적용</button>
-    <button onclick="selectProduct(3, 'gift')" aria-label="증정품 3 위치 수정">위치 수정</button>
-  </div>
-
-  <button onclick="resetAll()" aria-label="초기화">초기화</button>
-
-  <canvas id="canvas" width="1000" height="1000"></canvas>
 
   <pre id="content" style="white-space: pre-wrap;"></pre>
   <div id="selection_message"></div>
 
-</head>
-<body>
   <nav>
     <ul>
       <li><a href="https://supportpark98.github.io/my-webapp/privacy-policy.html">개인정보처리방침</a></li>
@@ -404,10 +447,10 @@
       const mainProductRatios = [document.getElementById('main_product_ratio1'), document.getElementById('main_product_ratio2'), document.getElementById('main_product_ratio3')];
       const giftProductRatios = [document.getElementById('gift_product_ratio1'), document.getElementById('gift_product_ratio2'), document.getElementById('gift_product_ratio3')];
       mainProductRatios.forEach((select) => {
-        select.innerHTML = generateRatioOptions(100);
+        select.innerHTML = generateRatioOptions(70);
       });
       giftProductRatios.forEach((select) => {
-        select.innerHTML = generateRatioOptions(70);
+        select.innerHTML = generateRatioOptions(40);
       });
       document.getElementById('selection_message').innerText = '';
 
