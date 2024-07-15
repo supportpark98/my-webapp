@@ -38,7 +38,6 @@
 
   <p>Thumbnail Maker for KERA</p>
 
-
   <button id="authorize_button" onclick="handleAuthClick()" aria-label="Authorize">Authorize</button>
   <button id="signout_button" onclick="handleSignoutClick()" aria-label="Sign Out">Sign Out</button>
 
@@ -111,7 +110,7 @@
 
   <button onclick="resetAll()" aria-label="초기화">초기화</button>
 
-  <canvas id="canvas" width="300" height="300"></canvas>
+  <canvas id="canvas" width="1000" height="1000"></canvas>
 
   <pre id="content" style="white-space: pre-wrap;"></pre>
   <div id="selection_message"></div>
@@ -151,15 +150,15 @@
     let isEditing = false; 
   
     const mainProductPositions = [
-      { x: 37, y: 190 },
-      { x: 75, y: 190 },
-      { x: 112, y: 190 }
+      { x: 125, y: 630 },
+      { x: 250, y: 630 },
+      { x: 375, y: 630 }
     ];
   
     const giftProductPositions = [
-      { x: 175, y: 200 },
-      { x: 212, y: 200 },
-      { x: 249, y: 200 }
+      { x: 625, y: 670 },
+      { x: 750, y: 670 },
+      { x: 875, y: 670 }
     ];
   
     function gapiLoaded() {
@@ -226,7 +225,7 @@
       try {
         response = await gapi.client.drive.files.list({
           'q': `'${folderId}' in parents and mimeType contains 'image/'`,
-          'fields': 'files(id, name, mimeType, thumbnailLink)',
+          'fields': 'files(id, name, mimeType)',
           'orderBy': 'name' // 파일 이름을 기준으로 오름차순 정렬
         });
         console.log(response);
@@ -245,7 +244,7 @@
       noneOption.textContent = '없음';
       noneOption.onclick = () => {
         searchBox.value = '없음';
-        searchBox.dataset.thumbnailLink = '';
+        searchBox.dataset.fileId = '';
         dropdown.style.display = 'none';
       };
       dropdown.appendChild(noneOption);
@@ -253,10 +252,10 @@
       items.forEach((item) => {
         const div = document.createElement('div');
         div.textContent = item.name;
-        div.dataset.thumbnailLink = item.thumbnailLink;
+        div.dataset.fileId = item.id;
         div.onclick = () => {
           searchBox.value = item.name;
-          searchBox.dataset.thumbnailLink = item.thumbnailLink;
+          searchBox.dataset.fileId = item.id;
           dropdown.style.display = 'none';
         };
         dropdown.appendChild(div);
@@ -292,15 +291,16 @@
       }
     }
   
-    function displayProduct(index, type) {
+    async function displayProduct(index, type) {
       const searchBox = document.getElementById(`${type}_product_search${index}`);
       const ratioSelector = document.getElementById(`${type}_product_ratio${index}`);
-      const thumbnailLink = searchBox.dataset.thumbnailLink;
+      const fileId = searchBox.dataset.fileId;
       const ratio = parseInt(ratioSelector.value, 10) / 100;
       const imageArray = type === 'main' ? mainProductImages : giftProductImages;
-      if (thumbnailLink) {
+      if (fileId) {
+        const imageUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
         imageArray[index - 1] = new Image();
-        imageArray[index - 1].src = thumbnailLink;
+        imageArray[index - 1].src = imageUrl;
         imageArray[index - 1].onload = () => drawCanvas();
         imageArray[index - 1].ratio = ratio;
       } else {
@@ -340,12 +340,11 @@
       }
       drawCanvas();
     }
-  
     function drawCanvas() {
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
+
       mainProductImages.forEach((image, index) => {
         if (image) {
           const pos = mainProductPositions[index];
@@ -354,7 +353,7 @@
           const x = pos.x - scaledWidth / 2;
           const y = pos.y - scaledHeight / 2;
           ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
-  
+
           if (selectedImageIndex === index) {
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 1;
@@ -362,7 +361,7 @@
           }
         }
       });
-  
+
       giftProductImages.forEach((image, index) => {
         if (image) {
           const pos = giftProductPositions[index];
@@ -371,18 +370,18 @@
           const x = pos.x - scaledWidth / 2;
           const y = pos.y - scaledHeight / 2;
           ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
-  
+
           if (selectedImageIndex === index + 3) {
             ctx.strokeStyle = 'red';
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 1;
             ctx.strokeRect(x, y, scaledWidth, scaledHeight);
           }
-  
+
           const quantity = giftQuantities[index];
           if (quantity > 0) {
             const text = `X ${quantity}`;
             ctx.fillStyle = '#000';
-            ctx.font = '16px Arial';
+            ctx.font = 'bold 64px Arial'; // 볼드 처리
             const textWidth = ctx.measureText(text).width;
             const textX = pos.x - textWidth / 2;
             const textY = pos.y - scaledHeight / 2 - 10;
@@ -391,7 +390,7 @@
         }
       });
     }
-  
+
     function resetAll() {
       mainProductImages = [null, null, null];
       giftProductImages = [null, null, null];
@@ -411,10 +410,10 @@
         select.innerHTML = generateRatioOptions(70);
       });
       document.getElementById('selection_message').innerText = '';
-  
+
       const mainProductButtons = document.querySelectorAll('#main_product button');
       const giftProductButtons = document.querySelectorAll('#gift_product button');
-  
+
       mainProductButtons.forEach(btn => { 
         if (btn.innerText !== '적용'){ 
           btn.innerText = '위치 수정';
@@ -427,10 +426,10 @@
           btn.style.backgroundColor = ''; 
         }
       });
-  
+
       drawCanvas();
     }
-  
+
     function generateRatioOptions(defaultValue) {
       let options = '';
       for (let i = 10; i <= 200; i += 10) {
@@ -438,12 +437,12 @@
       }
       return options;
     }
-  
+
     function handleKeyDown(event) {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) {
         event.preventDefault();
       }
-  
+
       if (isEditing && selectedImageIndex !== null) {
         const imageArray = selectedImageIndex < 3 ? mainProductImages : giftProductImages;
         const index = selectedImageIndex < 3 ? selectedImageIndex : selectedImageIndex - 3;
@@ -451,22 +450,22 @@
         const pos = positions[index];
         switch (event.key) {
           case 'ArrowUp':
-            pos.y -= 5;
+            pos.y -= 20;
             break;
           case 'ArrowDown':
-            pos.y += 5;
+            pos.y += 20;
             break;
           case 'ArrowLeft':
-            pos.x -= 5;
+            pos.x -= 20;
             break;
           case 'ArrowRight':
-            pos.x += 5;
+            pos.x += 20;
             break;
           case 'Enter':
             isEditing = false;
             selectedImageIndex = null;
             document.getElementById('selection_message').innerText = '';
-  
+
             document.querySelectorAll('#main_product button, #gift_product button').forEach(btn => {
               if (btn.innerText === '위치 변경중') {
                 btn.innerText = '위치 수정';
@@ -478,22 +477,22 @@
         drawCanvas();
       }
     }
-  
+
     document.addEventListener('keydown', handleKeyDown);
-  
+
     document.addEventListener('DOMContentLoaded', () => {
       const mainProductRatios = [document.getElementById('main_product_ratio1'), document.getElementById('main_product_ratio2'), document.getElementById('main_product_ratio3')];
       const giftProductRatios = [document.getElementById('gift_product_ratio1'), document.getElementById('gift_product_ratio2'), document.getElementById('gift_product_ratio3')];
-  
+
       mainProductRatios.forEach((select, index) => {
-        select.innerHTML = generateRatioOptions(100);
-      });
-  
-      giftProductRatios.forEach((select, index) => {
         select.innerHTML = generateRatioOptions(70);
       });
+
+      giftProductRatios.forEach((select, index) => {
+        select.innerHTML = generateRatioOptions(40);
+      });
     });
-  
+
     document.addEventListener('click', (event) => {
       const dropdowns = document.querySelectorAll('.dropdown-content');
       dropdowns.forEach(dropdown => {
