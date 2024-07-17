@@ -85,6 +85,21 @@
       background-color: #f0f0f0; /* 동일한 디자인 */
       padding: 10px 20px;
     }
+    .tooltip {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 5px;
+      z-index: 1000;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    .tooltip-icon {
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 5px;
+    }
   </style>
 </head>
 <body>
@@ -100,22 +115,37 @@
         <input type="text" id="main_product_search1" class="search-box" placeholder="Search...">
         <div id="main_product_dropdown1" class="dropdown-content"></div>
         <input type="text" id="main_product_ratio1" class="ratio-input" placeholder="비율(%)" value="70%">
-        <button onclick="displayProduct(1, 'main')" aria-label="본품 1 적용">적용</button>
-        <button onclick="selectProduct(1, 'main')" aria-label="본품 1 위치 수정">위치 수정</button>
+        <button id="apply_main1" onclick="displayProduct(1, 'main')" aria-label="본품 1 적용">적용</button>
+        <label>
+          <input type="checkbox" id="edit_position1" onclick="selectProduct(1, 'main')" aria-label="본품 1 위치 수정">
+          위치 수정
+          <span class="tooltip-icon" onmouseover="showTooltip(event)" onmouseout="hideTooltip(event)">?</span>
+        </label>
+        <div class="tooltip" id="tooltip1">위치수정을 원하는 경우 체크박스 체크 후 키보드 방향키로 움직입니다.</div>
 
         <h3>본품 2을 골라주세요</h3>
         <input type="text" id="main_product_search2" class="search-box" placeholder="Search...">
         <div id="main_product_dropdown2" class="dropdown-content"></div>
         <input type="text" id="main_product_ratio2" class="ratio-input" placeholder="비율(%)" value="70%">
-        <button onclick="displayProduct(2, 'main')" aria-label="본품 2 적용">적용</button>
-        <button onclick="selectProduct(2, 'main')" aria-label="본품 2 위치 수정">위치 수정</button>
+        <button id="apply_main2" onclick="displayProduct(2, 'main')" aria-label="본품 2 적용">적용</button>
+        <label>
+          <input type="checkbox" id="edit_position2" onclick="selectProduct(2, 'main')" aria-label="본품 2 위치 수정">
+          위치 수정
+          <span class="tooltip-icon" onmouseover="showTooltip(event)" onmouseout="hideTooltip(event)">?</span>
+        </label>
+        <div class="tooltip" id="tooltip2">위치수정을 원하는 경우 체크박스 체크 후 키보드 방향키로 움직입니다.</div>
 
         <h3>본품 3을 골라주세요</h3>
         <input type="text" id="main_product_search3" class="search-box" placeholder="Search...">
         <div id="main_product_dropdown3" class="dropdown-content"></div>
         <input type="text" id="main_product_ratio3" class="ratio-input" placeholder="비율(%)" value="70%">
-        <button onclick="displayProduct(3, 'main')" aria-label="본품 3 적용">적용</button>
-        <button onclick="selectProduct(3, 'main')" aria-label="본품 3 위치 수정">위치 수정</button>
+        <button id="apply_main3" onclick="displayProduct(3, 'main')" aria-label="본품 3 적용">적용</button>
+        <label>
+          <input type="checkbox" id="edit_position3" onclick="selectProduct(3, 'main')" aria-label="본품 3 위치 수정">
+          위치 수정
+          <span class="tooltip-icon" onmouseover="showTooltip(event)" onmouseout="hideTooltip(event)">?</span>
+        </label>
+        <div class="tooltip" id="tooltip3">위치수정을 원하는 경우 체크박스 체크 후 키보드 방향키로 움직입니다.</div>
       </div>
 
       <div id="gift_product">
@@ -128,11 +158,16 @@
         </select>
         <input type="text" id="gift_product_search1" class="search-box" placeholder="Search...">
         <div id="gift_product_dropdown1" class="dropdown-content"></div>
-        <input type="text" id="gift_product_ratio1" class="ratio-input" placeholder="비율(%)" value="40%">
-        <input type="number" id="gift_quantity1" min="1" placeholder="수량" class="quantity-input">
-        <button onclick="displayProduct(1, 'gift')" aria-label="증정품 1 적용">적용</button>
-        <button onclick="selectProduct(1, 'gift')" aria-label="증정품 1 위치 수정">위치 수정</button>
-
+        <input type="text" id="gift_product_ratio1" class="ratio-input" placeholder="비율(%)" value="40%" onkeydown="if(event.key === 'Enter') document.getElementById('apply_gift1').click()">
+        <input type="number" id="gift_quantity1" min="1" placeholder="수량" class="quantity-input" onkeydown="if(event.key === 'Enter') document.getElementById('apply_gift1').click()">
+        <button id="apply_gift1" onclick="displayProduct(1, 'gift')" aria-label="증정품 1 적용">적용</button>
+        <label>
+          <input type="checkbox" id="edit_position4" onclick="selectProduct(1, 'gift')" aria-label="증정품 1 위치 수정">
+          위치 수정
+          <span class="tooltip-icon" onmouseover="showTooltip(event)" onmouseout="hideTooltip(event)">?</span>
+        </label>
+        <div class="tooltip" id="tooltip4">위치수정을 원하는 경우 체크박스 체크 후 키보드 방향키로 움직입니다.</div>
+      
         <h3>증정품 2을 골라주세요</h3>
         <select id="gift_type_selector2" onchange="handleGiftTypeChange(2)">
           <option value="">없음</option>
@@ -142,11 +177,16 @@
         </select>
         <input type="text" id="gift_product_search2" class="search-box" placeholder="Search...">
         <div id="gift_product_dropdown2" class="dropdown-content"></div>
-        <input type="text" id="gift_product_ratio2" class="ratio-input" placeholder="비율(%)" value="40%">
-        <input type="number" id="gift_quantity2" min="1" placeholder="수량" class="quantity-input">
-        <button onclick="displayProduct(2, 'gift')" aria-label="증정품 2 적용">적용</button>
-        <button onclick="selectProduct(2, 'gift')" aria-label="증정품 2 위치 수정">위치 수정</button>
-
+        <input type="text" id="gift_product_ratio2" class="ratio-input" placeholder="비율(%)" value="40%" onkeydown="if(event.key === 'Enter') document.getElementById('apply_gift2').click()">
+        <input type="number" id="gift_quantity2" min="1" placeholder="수량" class="quantity-input" onkeydown="if(event.key === 'Enter') document.getElementById('apply_gift2').click()">
+        <button id="apply_gift2" onclick="displayProduct(2, 'gift')" aria-label="증정품 2 적용">적용</button>
+        <label>
+          <input type="checkbox" id="edit_position5" onclick="selectProduct(2, 'gift')" aria-label="증정품 2 위치 수정">
+          위치 수정
+          <span class="tooltip-icon" onmouseover="showTooltip(event)" onmouseout="hideTooltip(event)">?</span>
+        </label>
+        <div class="tooltip" id="tooltip5">위치수정을 원하는 경우 체크박스 체크 후 키보드 방향키로 움직입니다.</div>
+      
         <h3>증정품 3을 골라주세요</h3>
         <select id="gift_type_selector3" onchange="handleGiftTypeChange(3)">
           <option value="">없음</option>
@@ -156,10 +196,15 @@
         </select>
         <input type="text" id="gift_product_search3" class="search-box" placeholder="Search...">
         <div id="gift_product_dropdown3" class="dropdown-content"></div>
-        <input type="text" id="gift_product_ratio3" class="ratio-input" placeholder="비율(%)" value="40%">
-        <input type="number" id="gift_quantity3" min="1" placeholder="수량" class="quantity-input">
-        <button onclick="displayProduct(3, 'gift')" aria-label="증정품 3 적용">적용</button>
-        <button onclick="selectProduct(3, 'gift')" aria-label="증정품 3 위치 수정">위치 수정</button>
+        <input type="text" id="gift_product_ratio3" class="ratio-input" placeholder="비율(%)" value="40%" onkeydown="if(event.key === 'Enter') document.getElementById('apply_gift3').click()">
+        <input type="number" id="gift_quantity3" min="1" placeholder="수량" class="quantity-input" onkeydown="if(event.key === 'Enter') document.getElementById('apply_gift3').click()">
+        <button id="apply_gift3" onclick="displayProduct(3, 'gift')" aria-label="증정품 3 적용">적용</button>
+        <label>
+          <input type="checkbox" id="edit_position6" onclick="selectProduct(3, 'gift')" aria-label="증정품 3 위치 수정">
+          위치 수정
+          <span class="tooltip-icon" onmouseover="showTooltip(event)" onmouseout="hideTooltip(event)">?</span>
+        </label>
+        <div class="tooltip" id="tooltip6">위치수정을 원하는 경우 체크박스 체크 후 키보드 방향키로 움직입니다.</div>
       </div>
 
       <button class="reset-button" onclick="resetAll()" aria-label="초기화">초기화</button>
@@ -205,7 +250,7 @@
     let mainProductImages = [null, null, null];
     let giftProductImages = [null, null, null];
     let giftQuantities = [0, 0, 0];
-    let selectedImageIndex = null; 
+    let selectedImageIndexes = []; 
     let isEditing = false; 
     let isGridVisible = false;
 
@@ -374,29 +419,24 @@
     }
 
     function selectProduct(index, type) {
-      const button = event.target;
-
-      document.querySelectorAll('#main_product button, #gift_product button').forEach(btn => {
-        if (btn.innerText === '위치 변경중') {
-          btn.innerText = '위치 수정';
-          btn.style.backgroundColor = '';
+      const checkbox = document.getElementById(`edit_position${index + (type === 'main' ? 0 : 3)}`);
+      const imageIndex = index - 1 + (type === 'main' ? 0 : 3);
+      if (checkbox.checked) {
+        if (!selectedImageIndexes.includes(imageIndex)) {
+          selectedImageIndexes.push(imageIndex);
         }
-      });
-
-      if (isEditing && selectedImageIndex === index - 1 + (type === 'main' ? 0 : 3)) {
-        isEditing = false;
-        selectedImageIndex = null;
-        button.innerText = '위치 수정';
-        button.style.backgroundColor = '';
-        document.getElementById('selection_message').innerText = '';
-      } else {
         isEditing = true;
-        selectedImageIndex = index - 1 + (type === 'main' ? 0 : 3);
         const productType = type === 'main' ? '본품' : '증정품';
         document.getElementById('selection_message').innerText = `${productType} 이미지 ${index}이 선택되었습니다!`;
-
-        button.innerText = '위치 변경중';
-        button.style.backgroundColor = 'lightblue';
+      } else {
+        const idx = selectedImageIndexes.indexOf(imageIndex);
+        if (idx > -1) {
+          selectedImageIndexes.splice(idx, 1);
+        }
+        if (selectedImageIndexes.length === 0) {
+          isEditing = false;
+          document.getElementById('selection_message').innerText = '';
+        }
       }
       drawCanvas();
     }
@@ -419,7 +459,7 @@
           const y = pos.y - scaledHeight / 2;
           ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
 
-          if (selectedImageIndex === index) {
+          if (selectedImageIndexes.includes(index)) {
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 1;
             ctx.strokeRect(x, y, scaledWidth, scaledHeight);
@@ -436,7 +476,7 @@
           const y = pos.y - scaledHeight / 2;
           ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
 
-          if (selectedImageIndex === index + 3) {
+          if (selectedImageIndexes.includes(index + 3)) {
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 1;
             ctx.strokeRect(x, y, scaledWidth, scaledHeight);
@@ -498,7 +538,7 @@
       mainProductImages = [null, null, null];
       giftProductImages = [null, null, null];
       giftQuantities = [0, 0, 0];
-      selectedImageIndex = null;
+      selectedImageIndexes = [];
       isEditing = false;
       document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
       document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
@@ -506,21 +546,11 @@
       document.querySelectorAll('.dropdown-content').forEach(dropdown => dropdown.innerHTML = '');
       document.getElementById('selection_message').innerText = '';
 
-      const mainProductButtons = document.querySelectorAll('#main_product button');
-      const giftProductButtons = document.querySelectorAll('#gift_product button');
+      const mainProductCheckboxes = document.querySelectorAll('#main_product input[type="checkbox"]');
+      const giftProductCheckboxes = document.querySelectorAll('#gift_product input[type="checkbox"]');
 
-      mainProductButtons.forEach(btn => { 
-        if (btn.innerText !== '적용'){ 
-          btn.innerText = '위치 수정';
-          btn.style.backgroundColor = ''; 
-        }
-      });
-      giftProductButtons.forEach(btn => { 
-        if (btn.innerText !== '적용'){ 
-          btn.innerText = '위치 수정';
-          btn.style.backgroundColor = ''; 
-        }
-      });
+      mainProductCheckboxes.forEach(checkbox => checkbox.checked = false);
+      giftProductCheckboxes.forEach(checkbox => checkbox.checked = false);
 
       // 초기 비율 값 설정
       document.getElementById('main_product_ratio1').value = '70%';
@@ -552,41 +582,31 @@
     }
 
     function handleKeyDown(event) {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
         event.preventDefault();
       }
 
-      if (isEditing && selectedImageIndex !== null) {
-        const imageArray = selectedImageIndex < 3 ? mainProductImages : giftProductImages;
-        const index = selectedImageIndex < 3 ? selectedImageIndex : selectedImageIndex - 3;
-        const positions = selectedImageIndex < 3 ? mainProductPositions : giftProductPositions;
-        const pos = positions[index];
-        switch (event.key) {
-          case 'ArrowUp':
-            pos.y -= 20;
-            break;
-          case 'ArrowDown':
-            pos.y += 20;
-            break;
-          case 'ArrowLeft':
-            pos.x -= 20;
-            break;
-          case 'ArrowRight':
-            pos.x += 20;
-            break;
-          case 'Enter':
-            isEditing = false;
-            selectedImageIndex = null;
-            document.getElementById('selection_message').innerText = '';
-
-            document.querySelectorAll('#main_product button, #gift_product button').forEach(btn => {
-              if (btn.innerText === '위치 변경중') {
-                btn.innerText = '위치 수정';
-                btn.style.backgroundColor = '';
-              }
-            });
-            break;
-        }
+      if (isEditing && selectedImageIndexes.length > 0) {
+        selectedImageIndexes.forEach(selectedImageIndex => {
+          const imageArray = selectedImageIndex < 3 ? mainProductImages : giftProductImages;
+          const index = selectedImageIndex < 3 ? selectedImageIndex : selectedImageIndex - 3;
+          const positions = selectedImageIndex < 3 ? mainProductPositions : giftProductPositions;
+          const pos = positions[index];
+          switch (event.key) {
+            case 'ArrowUp':
+              pos.y -= 20;
+              break;
+            case 'ArrowDown':
+              pos.y += 20;
+              break;
+            case 'ArrowLeft':
+              pos.x -= 20;
+              break;
+            case 'ArrowRight':
+              pos.x += 20;
+              break;
+          }
+        });
         drawCanvas();
       }
     }
@@ -595,8 +615,9 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const ratioInputs = document.querySelectorAll('.ratio-input');
+      const quantityInputs = document.querySelectorAll('.quantity-input');
 
-      ratioInputs.forEach((input) => {
+      ratioInputs.forEach((input, index) => {
         input.addEventListener('input', () => {
           if (!input.value.endsWith('%')) {
             input.value = input.value.replace('%', '') + '%';
@@ -618,6 +639,36 @@
           input.parentNode.appendChild(dropdown);
           dropdown.style.display = 'block';
         });
+
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            if (index < 3) {
+              document.getElementById(`apply_main${index + 1}`).click();
+            } else {
+              document.getElementById(`apply_gift${index - 2}`).click();
+            }
+          }
+          // 추가된 코드: 방향키로 커서 이동 허용
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            // 커서 이동을 허용
+            event.stopPropagation();
+          }
+        });
+      });
+
+      quantityInputs.forEach((input, index) => {
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById(`apply_gift${index + 1}`).click();
+          }
+          // 추가된 코드: 방향키로 커서 이동 허용
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            // 커서 이동을 허용
+            event.stopPropagation();
+          }
+        });
       });
     });
 
@@ -626,6 +677,37 @@
       dropdowns.forEach(dropdown => {
         if (!dropdown.contains(event.target) && !dropdown.previousElementSibling.contains(event.target)) {
           dropdown.style.display = 'none';
+        }
+      });
+    });
+
+    function showTooltip(event) {
+      const tooltip = event.target.nextElementSibling;
+      tooltip.style.display = 'block';
+      tooltip.style.left = `${event.pageX + 10}px`;
+      tooltip.style.top = `${event.pageY + 10}px`;
+    }
+
+    function hideTooltip(event) {
+      const tooltip = event.target.nextElementSibling;
+      tooltip.style.display = 'none';
+    }
+
+    document.querySelectorAll('.tooltip-icon').forEach(icon => {
+      icon.addEventListener('mouseover', (event) => {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        tooltip.innerText = '방향키로 이동이 가능합니다';
+        document.body.appendChild(tooltip);
+        tooltip.style.left = `${event.pageX + 10}px`;
+        tooltip.style.top = `${event.pageY + 10}px`;
+        icon.tooltip = tooltip;
+      });
+
+      icon.addEventListener('mouseout', (event) => {
+        if (icon.tooltip) {
+          icon.tooltip.remove();
+          icon.tooltip = null;
         }
       });
     });
